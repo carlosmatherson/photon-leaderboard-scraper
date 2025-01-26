@@ -1,5 +1,6 @@
 #%% Import
 from helper_functions.photonScraper import scrape_photon_leaderboard
+from helper_functions.photonScraperV2 import scrape_photon_leaderboard_v2
 from helper_functions.compare_addresses import compare_addresses
 from helper_functions.get_token_info import get_token_info
 from datetime import datetime
@@ -18,7 +19,7 @@ timestamp = datetime.now().strftime('%Y%m%d')
 existing_caputres = [file for file in os.listdir(PHOTON_DATA_PATH) if file.startswith(timestamp)]
 
 if not existing_caputres:
-    photon_df = scrape_photon_leaderboard()
+    photon_df = scrape_photon_leaderboard_v2()
     photon_df.to_csv(os.path.join(PHOTON_DATA_PATH, f'{timestamp}_photon_leaderboard.csv'))
 else:
     recent_capture = max(existing_caputres)
@@ -37,7 +38,7 @@ for file in solscan_files:
     
     ticker, contract_address = get_token_info(file)
     
-    matches = compare_addresses(photon_df, token_holders_df)
+    matches, trader_check, holder_check = compare_addresses(photon_df, token_holders_df)
     
     result = {
         'TIMESTAMP': timestamp,
@@ -51,3 +52,7 @@ for file in solscan_files:
 #%% Update Notes
 notes_df = pd.DataFrame(all_results)
 notes_df.to_csv('notes.csv', index=False)
+
+# #%% check
+# trader_check = pd.DataFrame(trader_check).to_csv('trader_check.csv')
+# holder_check = pd.DataFrame(holder_check).to_csv('holder_check.csv')
